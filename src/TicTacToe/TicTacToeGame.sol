@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 import "forge-std/console.sol";
-import "../Core/AbstractGameManager.sol";
+import "../Core/AbstractGame.sol";
 import "@openzeppelin/utils/math/SafeMath.sol";
 
-contract TicTacToeGame is AbstractGameManager {
+contract TicTacToeGame is AbstractGame {
     using SafeMath for uint128;
     using SafeMath for uint256;
 
@@ -18,6 +18,7 @@ contract TicTacToeGame is AbstractGameManager {
         uint128 localX,
         uint128 localY
     );
+
     event LocalWinner(uint8 winner, uint128 x, uint128 y);
     event GlobalWinner(uint8 winner);
     event LocalDraw(uint128 x, uint128 y);
@@ -33,28 +34,36 @@ contract TicTacToeGame is AbstractGameManager {
         uint128 y;
     }
 
-    Grid public masterGrid;
-    Grid[3][3] public grids;
+    Grid internal masterGrid;
+    Grid[3][3] internal grids;
 
     uint256 public currentPlayer;
-    Coords public currentGridCoords;
     bool public useCurrentGrid;
 
-    constructor(address[] memory players_, uint256 playerGasLimit_)
-        AbstractGameManager(players_, playerGasLimit_)
+    Coords internal currentGridCoords;
+
+    function getLocalGrid(uint256 x, uint256 y)
+        public
+        view
+        returns (Grid memory)
     {
-        currentPlayer = 0;
-        currentGridCoords.x = 0;
-        currentGridCoords.y = 0;
-        useCurrentGrid = false;
+        return grids[x][y];
     }
 
-    function init() public override(IGameManager) {
-        gameState = GameState.Active;
+    function getGlobalGrid() public view returns (Grid memory) {
+        return masterGrid;
     }
 
-    function applyMove(bytes calldata input) public override(IGameManager) {
-        if (gameState != GameState.Active) {
+    function getCurrentGrid() public view returns (Grid memory) {
+        return grids[currentGridCoords.x][currentGridCoords.y];
+    }
+
+    function getCurrentGridCoords() public view returns (Coords memory) {
+        return currentGridCoords;
+    }
+
+    function applyMove(bytes calldata input) public override(IGame) {
+        if (state != GameState.Active) {
             revert TicTacToeGame__gameNotActive();
         }
 
@@ -119,7 +128,7 @@ contract TicTacToeGame is AbstractGameManager {
 
         uint8 gameWinner = checkWinner(masterGrid);
         if (gameWinner != 0) {
-            gameState = GameState.Finished;
+            state = GameState.Finished;
             emit GlobalWinner(gameWinner);
         }
 

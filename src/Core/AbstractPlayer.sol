@@ -1,41 +1,24 @@
 pragma solidity ^0.8.13;
 import "forge-std/console.sol";
 import "../Interfaces/IPlayer.sol";
+import "./AbstractGame.sol";
 
 abstract contract AbstractPlayer is IPlayer {
     uint256 public index;
     uint256 public score;
 
-    bool public isActive;
-    bool public hasExecuted;
     bool public isInitialized;
 
-    bytes internal input;
-    bytes internal output;
-
-    constructor(uint256 index_) {
+    constructor() {
         isInitialized = false;
-        hasExecuted = false;
         score = 0;
     }
 
-    function setIndex(uint256 index_) public {
+    function init(
+        address, /*gameAddress*/
+        uint256 index_
+    ) public virtual {
         index = index_;
-    }
-
-    function setScore(uint256 score_) public {
-        score = score_;
-    }
-
-    function setActive(bool isActive_) public {
-        isActive = isActive_;
-    }
-
-    function resetInput() public {
-        input = "";
-    }
-
-    function resetOutput() public {
-        output = "";
+        isInitialized = true;
     }
 }
