@@ -5,7 +5,6 @@ import "./AbstractPlayer.sol";
 import "../Interfaces/IGame.sol";
 
 abstract contract AbstractGame is IGame {
-
     enum GameState {
         Invalid,
         Initialized,
