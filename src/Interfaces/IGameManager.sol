@@ -4,8 +4,10 @@ import "forge-std/console.sol";
 
 interface IGameManager {
     function init() external;
+
     function execute() external;
 
-    function applyMove(bytes calldata input) external returns (bytes memory gameState);
-    function gameState() external returns(bytes memory gameState);
+    function applyMove(bytes calldata input) external;
+
+    function gameState() external returns (bytes memory gameState);
 }

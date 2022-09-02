@@ -3,7 +3,6 @@ import "forge-std/console.sol";
 import "../Interfaces/IPlayer.sol";
 
 abstract contract AbstractPlayer is IPlayer {
-
     uint256 public index;
     uint256 public score;
 
@@ -14,11 +13,14 @@ abstract contract AbstractPlayer is IPlayer {
     bytes internal input;
     bytes internal output;
 
-    constructor(uint256 index_){
-        index = index_;
+    constructor(uint256 index_) {
         isInitialized = false;
         hasExecuted = false;
         score = 0;
+    }
+
+    function setIndex(uint256 index_) public {
+        index = index_;
     }
 
     function setScore(uint256 score_) public {
@@ -36,5 +38,4 @@ abstract contract AbstractPlayer is IPlayer {
     function resetOutput() public {
         output = "";
     }
-
 }

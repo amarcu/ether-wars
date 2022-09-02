@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import {Game} from  "./Game.sol";
+import {Game} from "./Game.sol";
 import {Player as Player1} from "./Player1.sol";
 import {Player as Player2} from "./Player2.sol";
 import {IPlayer} from "./IPlayer.sol";
@@ -23,13 +23,17 @@ contract RunGame {
 
     function run() public {
         // Register players
-        for (uint256 playerIndex = 0; playerIndex < players.length; playerIndex++) {
+        for (
+            uint256 playerIndex = 0;
+            playerIndex < players.length;
+            playerIndex++
+        ) {
             game.registerPlayer(IPlayer(players[playerIndex]));
         }
 
         game.play();
 
         IPlayer winner = game.winner();
-        console.log(string(abi.encodePacked('Winner: ', winner.name())));
+        console.log(string(abi.encodePacked("Winner: ", winner.name())));
     }
 }

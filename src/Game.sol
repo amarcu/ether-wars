@@ -28,12 +28,8 @@ contract Game {
 
         // Save the random number
         number = uint256(
-            uint256(
-                keccak256(
-                    abi.encodePacked(blockhash(block.number - 1))
-                )
-            ) 
-            % max_
+            uint256(keccak256(abi.encodePacked(blockhash(block.number - 1)))) %
+                max_
         );
 
         console.log("Secret number is");
@@ -50,11 +46,19 @@ contract Game {
     function playRound() public {
         uint256[] memory playerIndexes = new uint256[](players.length);
         // TODO: shuffle players instead of default order
-        for (uint256 playerIndex = 0; playerIndex < players.length; playerIndex++) {
+        for (
+            uint256 playerIndex = 0;
+            playerIndex < players.length;
+            playerIndex++
+        ) {
             playerIndexes[playerIndex] = playerIndex;
         }
 
-        for(uint256 playerIndex = 0; playerIndex < players.length; playerIndex++) {
+        for (
+            uint256 playerIndex = 0;
+            playerIndex < players.length;
+            playerIndex++
+        ) {
             IPlayer player = players[playerIndexes[playerIndex]];
 
             player.makeGuess();
@@ -64,11 +68,17 @@ contract Game {
     function guess(uint256 guessedNumber_) public returns (GuessResult) {
         GuessResult guessResult = _guess(guessedNumber_);
 
-        console.log(string(abi.encodePacked(
-            "Player ", IPlayer(msg.sender).name(), " tried "
-        )));
+        console.log(
+            string(
+                abi.encodePacked(
+                    "Player ",
+                    IPlayer(msg.sender).name(),
+                    " tried "
+                )
+            )
+        );
         console.log(guessedNumber_);
-        
+
         if (guessResult == GuessResult.TOO_HIGH) {
             console.log("too high");
         } else if (guessResult == GuessResult.TOO_LOW) {
@@ -87,7 +97,7 @@ contract Game {
             return GuessResult.TOO_HIGH;
         } else if (guessedNumber_ < number) {
             return GuessResult.TOO_LOW;
-        } 
+        }
 
         // Save winner
         winnerIndex = playerAddressToIndex[msg.sender];
@@ -99,7 +109,7 @@ contract Game {
     }
 
     function play() public {
-        console.log('Starting game');
+        console.log("Starting game");
 
         uint256 maxRounds = 10;
         uint256 round = 0;
@@ -109,7 +119,7 @@ contract Game {
             playRound();
         }
 
-        console.log('Game ended');
+        console.log("Game ended");
     }
 
     function winner() public returns (IPlayer) {
