@@ -14,7 +14,7 @@ contract TicTacToeScript is Script {
         address[] memory players = new address[](2);
         game = new TicTacToeGame(players, 2000000);
 
-        TicTacToeGame.Move memory move;
+        TicTacToeGame.Coords memory move;
         move.x = 0;
         move.y = 0;
         game.applyMove(abi.encode(move));

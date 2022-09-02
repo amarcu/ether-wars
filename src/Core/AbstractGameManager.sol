@@ -5,7 +5,15 @@ import "./AbstractPlayer.sol";
 import "../Interfaces/IGameManager.sol";
 
 abstract contract AbstractGameManager is IGameManager {
+    enum GameState {
+        Invalid,
+        Active,
+        Finished
+    }
+
     uint256 public immutable playerGasLimit;
+
+    GameState public gameState;
 
     AbstractPlayer[] public players;
 
@@ -14,6 +22,7 @@ abstract contract AbstractGameManager is IGameManager {
     bytes public gameLogs;
 
     constructor(address[] memory players_, uint256 playerGasLimit_) {
+        gameState = GameState.Invalid;
         turnNr = 0;
         playerGasLimit = playerGasLimit_;
         gameLogs = "";
@@ -26,7 +35,6 @@ abstract contract AbstractGameManager is IGameManager {
 
     function execute() external override(IGameManager) {
         uint256 len = players.length;
-        bytes memory gameState = this.gameState();
         for (uint256 idx = 0; idx < len; ++idx) {
             try
                 this.applyMove(players[idx].execute{gas: playerGasLimit}())

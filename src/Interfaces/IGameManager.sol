@@ -8,6 +8,4 @@ interface IGameManager {
     function execute() external;
 
     function applyMove(bytes calldata input) external;
-
-    function gameState() external returns (bytes memory gameState);
 }

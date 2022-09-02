@@ -2,10 +2,25 @@
 pragma solidity 0.8.13;
 import "forge-std/console.sol";
 import "../Core/AbstractGameManager.sol";
+import "@openzeppelin/utils/math/SafeMath.sol";
 
 contract TicTacToeGame is AbstractGameManager {
-    event Winner(uint8 winner, uint128 x, uint128 y);
-    event Draw(uint128 x, uint128 y);
+    using SafeMath for uint128;
+    using SafeMath for uint256;
+
+    error TicTacToeGame__gameNotActive();
+    error TicTacToeGame__invalidMove();
+
+    event Move(
+        uint8 player,
+        uint128 gridX,
+        uint128 gridY,
+        uint128 localX,
+        uint128 localY
+    );
+    event LocalWinner(uint8 winner, uint128 x, uint128 y);
+    event GlobalWinner(uint8 winner);
+    event LocalDraw(uint128 x, uint128 y);
 
     struct Grid {
         uint8 winner;
@@ -13,18 +28,16 @@ contract TicTacToeGame is AbstractGameManager {
         uint8[3][3] cells;
     }
 
-    struct Move {
+    struct Coords {
         uint128 x;
         uint128 y;
     }
-
-    error TicTacToeGame__invalidMove();
 
     Grid public masterGrid;
     Grid[3][3] public grids;
 
     uint256 public currentPlayer;
-    Move public currentGridCoords;
+    Coords public currentGridCoords;
     bool public useCurrentGrid;
 
     constructor(address[] memory players_, uint256 playerGasLimit_)
@@ -36,66 +49,107 @@ contract TicTacToeGame is AbstractGameManager {
         useCurrentGrid = false;
     }
 
-    function init() public override(IGameManager) {}
+    function init() public override(IGameManager) {
+        gameState = GameState.Active;
+    }
 
     function applyMove(bytes calldata input) public override(IGameManager) {
-        Move memory move = abi.decode(input, (Move));
-        if (move.x < 0 || move.x >= 3 || move.y < 0 || move.y >= 3) {
+        if (gameState != GameState.Active) {
+            revert TicTacToeGame__gameNotActive();
+        }
+
+        Coords memory globalCoords = abi.decode(input, (Coords));
+
+        (Coords memory gridCoords, Coords memory localCoords) = toLocalCoords(
+            globalCoords
+        );
+        if (gridCoords.x >= 3 || gridCoords.y >= 3) {
             revert TicTacToeGame__invalidMove();
+        }
+
+        if (useCurrentGrid) {
+            if (
+                gridCoords.x != currentGridCoords.x ||
+                gridCoords.y != currentGridCoords.y
+            ) revert TicTacToeGame__invalidMove();
+        } else {
+            currentGridCoords = gridCoords;
         }
 
         Grid storage currentGrid = grids[uint256(currentGridCoords.x)][
             uint256(currentGridCoords.y)
         ];
 
-        if (currentGrid.cells[uint256(move.x)][uint256(move.y)] != 0) {
+        if (
+            currentGrid.cells[uint256(localCoords.x)][uint256(localCoords.y)] !=
+            0
+        ) {
             revert TicTacToeGame__invalidMove();
         }
 
         // update grid
-        currentGrid.cells[uint256(move.x)][uint256(move.y)] = uint8(
-            currentPlayer + 1
-        );
+        currentGrid.cells[uint256(localCoords.x)][
+            uint256(localCoords.y)
+        ] = uint8(currentPlayer + 1);
         currentGrid.moves++;
-        currentGridCoords = move;
 
-        //emit Move(currentPlayer + 1, currentGridCoords.x, currentGridCoords.y, move.x, move.y);
+        emit Move(
+            uint8(currentPlayer + 1),
+            currentGridCoords.x,
+            currentGridCoords.y,
+            localCoords.x,
+            localCoords.y
+        );
 
-        uint8 winner = _checkWinner(currentGrid);
+        uint8 winner = checkWinner(currentGrid);
         if (winner != 0) {
             if (winner == 3) {
-                emit Draw(currentGridCoords.x, currentGridCoords.y);
+                emit LocalDraw(currentGridCoords.x, currentGridCoords.y);
             } else {
-                emit Winner(winner, currentGridCoords.x, currentGridCoords.y);
+                emit LocalWinner(
+                    winner,
+                    currentGridCoords.x,
+                    currentGridCoords.y
+                );
             }
+
+            masterGrid.cells[currentGridCoords.x][currentGridCoords.y] = winner;
+            masterGrid.moves++;
         }
 
+        uint8 gameWinner = checkWinner(masterGrid);
+        if (gameWinner != 0) {
+            gameState = GameState.Finished;
+            emit GlobalWinner(gameWinner);
+        }
+
+        currentGridCoords = localCoords;
+        useCurrentGrid =
+            masterGrid.cells[currentGridCoords.x][currentGridCoords.y] == 0;
         currentPlayer = (currentPlayer + 1) % 2;
     }
 
-    function gameState()
+    function toLocalCoords(Coords memory global)
         public
-        override(IGameManager)
-        returns (bytes memory gameState)
-    {
-        return abi.encode(masterGrid, grids);
-    }
-
-    function _toLocalCoords(uint256 globalX, uint256 globalY)
-        internal
         pure
-        returns (
-            uint256 gridX,
-            uint256 gridY,
-            uint256 coordX,
-            uint256 coordY
-        )
+        returns (Coords memory gridCoords, Coords memory localCoords)
     {
-
-
+        gridCoords.x = global.x / 3;
+        gridCoords.y = global.y / 3;
+        localCoords.x = global.x % 3;
+        localCoords.y = global.y % 3;
     }
 
-    function _checkWinner(Grid memory grid) internal returns (uint8 winner) {
+    function toGlobalCoords(Coords memory gridCoords, Coords memory localCoords)
+        public
+        pure
+        returns (Coords memory globalCoords)
+    {
+        globalCoords.x = gridCoords.x * 3 + localCoords.x;
+        globalCoords.y = gridCoords.y * 3 + localCoords.y;
+    }
+
+    function checkWinner(Grid memory grid) public pure returns (uint8 winner) {
         // Stupid check, probably should go with O(1) -> update rows ,cols diag sums on move.
         for (uint256 x = 0; x < 3; ++x) {
             if (
