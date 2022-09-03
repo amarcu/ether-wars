@@ -33,16 +33,14 @@ contract TicTacToeSimplePlayer is AbstractPlayer {
             for (uint256 globalX = 0; globalX < 3; ++globalX) {
                 for (uint256 globalY = 0; globalY < 3; ++globalY) {
                     if (globalGrid.cells[globalX][globalY] == 0) {
-                        return
-                            abi.encode(
-                                _getMove(
-                                    TicTacToeGame.Coords(
-                                        uint128(globalX),
-                                        uint128(globalY)
-                                    ),
-                                    game.getLocalGrid(globalX, globalY)
-                                )
-                            );
+                        TicTacToeGame.Coords memory currentMove = _getMove(
+                            TicTacToeGame.Coords(
+                                uint128(globalX),
+                                uint128(globalY)
+                            ),
+                            game.getLocalGrid(globalX, globalY)
+                        );
+                        return abi.encode(currentMove);
                     }
                 }
             }
