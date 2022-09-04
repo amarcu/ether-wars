@@ -5,6 +5,8 @@ import "./AbstractPlayer.sol";
 import "../Interfaces/IGame.sol";
 
 abstract contract AbstractGame is IGame {
+    error AbstractGame__execute_gameNotActive();
+
     enum GameState {
         Invalid,
         Initialized,
@@ -19,11 +21,13 @@ abstract contract AbstractGame is IGame {
     AbstractPlayer[] public players;
     bytes[] public moves;
     bool[] public activePlayers;
+    uint256 public winner;
 
     uint256 public turnNr;
 
     constructor() {
         state = GameState.Invalid;
+        winner = 0;
     }
 
     function init(address[] memory players_, uint256 playerGasLimit_)
@@ -31,8 +35,8 @@ abstract contract AbstractGame is IGame {
         virtual
         override(IGame)
     {
-        state = GameState.Initialized;
         turnNr = 0;
+        state = GameState.Initialized;
         playerGasLimit = playerGasLimit_;
         uint256 len = players_.length;
         players = new AbstractPlayer[](len);
@@ -50,9 +54,20 @@ abstract contract AbstractGame is IGame {
         state = GameState.Active;
     }
 
+    function onInvalidMove(uint256 playerIndex) internal virtual;
+
+    function onPreTurn(uint256 playerIndex) internal virtual {}
+
+    function onPostTurn(uint256 playerIndex) internal virtual {}
+
     function execute() external override(IGame) {
         uint256 len = players.length;
         for (uint256 idx = 0; idx < len; ++idx) {
+            if (state != GameState.Active) break;
+
+            if (!activePlayers[idx]) continue;
+
+            onPreTurn(idx);
             try players[idx].move{gas: playerGasLimit}() returns (
                 bytes memory playerMove
             ) {
@@ -61,11 +76,14 @@ abstract contract AbstractGame is IGame {
                 } catch {
                     activePlayers[idx] = false;
                     moves[idx] = "";
+                    onInvalidMove(idx);
                 }
             } catch {
                 activePlayers[idx] = false;
                 moves[idx] = "";
+                onInvalidMove(idx);
             }
+            onPostTurn(idx);
         }
 
         turnNr++;

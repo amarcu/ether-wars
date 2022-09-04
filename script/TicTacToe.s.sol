@@ -7,8 +7,10 @@ import "forge-std/Vm.sol";
 import "@openzeppelin/utils/Strings.sol";
 
 import {AbstractGame} from "../src/Core/AbstractGame.sol";
-import {TicTacToeGame} from "../src/TicTacToe/TicTacToeGame.sol";
+import {TicTacToeGame, Grid, Coords} from "../src/TicTacToe/TicTacToeGame.sol";
 import {TicTacToeSimplePlayer} from "../src/TicTacToe/TicTacToeSimplePlayer.sol";
+import {WrongTicTacToePlayer} from "../src/TicTacToe/WrongTicTacToePlayer.sol";
+
 
 contract TicTacToeScript is Script {
 
@@ -17,19 +19,19 @@ contract TicTacToeScript is Script {
     Vm public cheatCodes = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
     
     struct MoveData{
-        TicTacToeGame.Coords move1;
-        TicTacToeGame.Coords move2;
+        Coords move1;
+        Coords move2;
     }
 
     TicTacToeGame public game;
     TicTacToeSimplePlayer public player1;
-    TicTacToeSimplePlayer public player2;
+    WrongTicTacToePlayer public player2;
     MoveData[] public turnMoves;
 
     function run() public {
         
         player1 = new TicTacToeSimplePlayer();
-        player2 = new TicTacToeSimplePlayer();
+        player2 = new WrongTicTacToePlayer();
         
         address[] memory players = new address[](2);
         players[0] = address(player1);
@@ -49,25 +51,20 @@ contract TicTacToeScript is Script {
 
             string memory lineLog = "";
             if (move1.length != 0){
-                TicTacToeGame.Coords memory coords = abi.decode(move1,(TicTacToeGame.Coords));
+                Coords memory coords = abi.decode(move1,(Coords));
                 lineLog = string.concat("0 ",Strings.toString(coords.x));
                 lineLog = string.concat(lineLog," ");
                 lineLog = string.concat(lineLog,Strings.toString(coords.y));
                 vm.writeLine("logs/test.txt",lineLog);
             }
-            
 
             if (move2.length != 0){
-                TicTacToeGame.Coords memory coords = abi.decode(move2,(TicTacToeGame.Coords));
+                Coords memory coords = abi.decode(move2,(Coords));
                 lineLog = string.concat("1 ",Strings.toString(coords.x));
                 lineLog = string.concat(lineLog," ");
                 lineLog = string.concat(lineLog,Strings.toString(coords.y));
                 vm.writeLine("logs/test.txt",lineLog);
             }
         }
-    }
-
-    function _printGrid() internal {
-        
     }
 }

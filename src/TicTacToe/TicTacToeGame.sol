@@ -4,6 +4,17 @@ import "forge-std/console.sol";
 import "../Core/AbstractGame.sol";
 import "@openzeppelin/utils/math/SafeMath.sol";
 
+struct Grid {
+    uint8 winner;
+    uint64 moves;
+    uint8[3][3] cells;
+}
+
+struct Coords {
+    uint128 x;
+    uint128 y;
+}
+
 contract TicTacToeGame is AbstractGame {
     using SafeMath for uint128;
     using SafeMath for uint256;
@@ -22,17 +33,8 @@ contract TicTacToeGame is AbstractGame {
     event LocalWinner(uint8 winner, uint128 x, uint128 y);
     event GlobalWinner(uint8 winner);
     event LocalDraw(uint128 x, uint128 y);
+    event PlayerEliminated(uint256 index);
 
-    struct Grid {
-        uint8 winner;
-        uint64 moves;
-        uint8[3][3] cells;
-    }
-
-    struct Coords {
-        uint128 x;
-        uint128 y;
-    }
 
     Grid internal masterGrid;
     Grid[3][3] internal grids;
@@ -60,6 +62,15 @@ contract TicTacToeGame is AbstractGame {
 
     function getCurrentGridCoords() public view returns (Coords memory) {
         return currentGridCoords;
+    }
+
+    function onInvalidMove(uint256 playerIndex)
+        internal
+        override(AbstractGame)
+    {
+        winner = (playerIndex + 1) % 2;
+        state = GameState.Finished;
+        emit PlayerEliminated(playerIndex);
     }
 
     function applyMove(bytes calldata input) public override(IGame) {
@@ -129,6 +140,7 @@ contract TicTacToeGame is AbstractGame {
         uint8 gameWinner = checkWinner(masterGrid);
         if (gameWinner != 0) {
             state = GameState.Finished;
+            winner = gameWinner;
             emit GlobalWinner(gameWinner);
         }
 
@@ -157,6 +169,12 @@ contract TicTacToeGame is AbstractGame {
         globalCoords.x = gridCoords.x * 3 + localCoords.x;
         globalCoords.y = gridCoords.y * 3 + localCoords.y;
     }
+
+    function getValidMoves(uint256 playerIndex)
+        public
+        view
+        returns (uint128[] memory x, uint128[] memory y)
+    {}
 
     function checkWinner(Grid memory grid) public pure returns (uint8 winner) {
         // Stupid check, probably should go with O(1) -> update rows ,cols diag sums on move.
