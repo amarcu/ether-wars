@@ -35,7 +35,6 @@ contract TicTacToeGame is AbstractGame {
     event LocalDraw(uint128 x, uint128 y);
     event PlayerEliminated(uint256 index);
 
-
     Grid internal masterGrid;
     Grid[3][3] internal grids;
 
