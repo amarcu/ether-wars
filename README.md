@@ -6,11 +6,6 @@ It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You 
 
 On Windows follow the install documentation: https://book.getfoundry.sh/getting-started/installation
 
-
-
-cargo install --git https://github.com/foundry-rs/foundry foundry-cli anvil --bins --locked
-To update from source, run the same command again.
-
 ## Installation
 
 To install dependencies run:
