@@ -15,3 +15,5 @@ test          	:; forge test
 test-gasreport 	:; forge test --gas-report
 # test-fork     :; forge test --gas-report --fork-url ${ETH_NODE}
 watch		  	:; forge test --watch src/ 
+
+play		  	:; forge script ./script/TicTacToe.s.sol -vvvv

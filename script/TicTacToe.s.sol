@@ -9,7 +9,7 @@ import "@openzeppelin/utils/Strings.sol";
 import {AbstractGame} from "../src/Core/AbstractGame.sol";
 import {TicTacToeGame, Grid, Coords} from "../src/TicTacToe/TicTacToeGame.sol";
 import {TicTacToeSimplePlayer} from "../src/TicTacToe/TicTacToeSimplePlayer.sol";
-import {WrongTicTacToePlayer} from "../src/TicTacToe/WrongTicTacToePlayer.sol";
+import {TicTacToeLocalHeuristics} from "../src/TicTacToe/TicTacToeLocalHeuristics.sol";
 
 
 contract TicTacToeScript is Script {
@@ -25,19 +25,19 @@ contract TicTacToeScript is Script {
 
     TicTacToeGame public game;
     TicTacToeSimplePlayer public player1;
-    WrongTicTacToePlayer public player2;
+    TicTacToeLocalHeuristics public player2;
     MoveData[] public turnMoves;
 
     function run() public {
         
         player1 = new TicTacToeSimplePlayer();
-        player2 = new WrongTicTacToePlayer();
+        player2 = new TicTacToeLocalHeuristics();
         
         address[] memory players = new address[](2);
         players[0] = address(player1);
         players[1] = address(player2);
 
-        vm.removeFile("logs/test.txt");
+        try vm.removeFile("logs/game.txt") {} catch{}
 
         game = new TicTacToeGame();
         game.init(players, 2000000);
@@ -55,7 +55,7 @@ contract TicTacToeScript is Script {
                 lineLog = string.concat("0 ",Strings.toString(coords.x));
                 lineLog = string.concat(lineLog," ");
                 lineLog = string.concat(lineLog,Strings.toString(coords.y));
-                vm.writeLine("logs/test.txt",lineLog);
+                vm.writeLine("logs/game.txt",lineLog);
             }
 
             if (move2.length != 0){
@@ -63,7 +63,7 @@ contract TicTacToeScript is Script {
                 lineLog = string.concat("1 ",Strings.toString(coords.x));
                 lineLog = string.concat(lineLog," ");
                 lineLog = string.concat(lineLog,Strings.toString(coords.y));
-                vm.writeLine("logs/test.txt",lineLog);
+                vm.writeLine("logs/game.txt",lineLog);
             }
         }
     }

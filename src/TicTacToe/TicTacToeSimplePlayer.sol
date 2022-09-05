@@ -23,11 +23,12 @@ contract TicTacToeSimplePlayer is AbstractPlayer {
         override(IPlayer)
         returns (bytes memory output)
     {
+        uint256 currentPlayer = game.currentPlayer();
         if (game.useCurrentGrid()) {
             Coords memory coords = game.getCurrentGridCoords();
             Grid memory grid = game.getCurrentGrid();
-
-            return abi.encode(_getMove(coords, grid));
+            Coords memory move_ = _getMove(coords, grid);
+            return abi.encode(move_);
         } else {
             Grid memory globalGrid = game.getGlobalGrid();
             for (uint256 globalX = 0; globalX < 3; ++globalX) {
