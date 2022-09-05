@@ -14,5 +14,9 @@ To install dependencies run:
 To compile the contracts run:
 ``make build``
 
+
+## Play
+
 To run a game:
 ``make play``
+
