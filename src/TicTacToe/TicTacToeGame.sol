@@ -31,7 +31,7 @@ contract TicTacToeGame is AbstractGame {
     );
 
     event LocalWinner(uint8 winner, uint128 x, uint128 y);
-    event GlobalWinner(uint8 winner);
+    event GlobalWinner(uint256 winner);
     event LocalDraw(uint128 x, uint128 y);
     event PlayerEliminated(uint256 index);
 
@@ -40,6 +40,7 @@ contract TicTacToeGame is AbstractGame {
 
     uint256 public currentPlayer;
     bool public useCurrentGrid;
+    uint256 public gameWinner;
 
     Coords internal currentGridCoords;
 
@@ -136,10 +137,9 @@ contract TicTacToeGame is AbstractGame {
             masterGrid.moves++;
         }
 
-        uint8 gameWinner = checkWinner(masterGrid);
+        gameWinner = uint256(checkWinner(masterGrid));
         if (gameWinner != 0) {
             state = GameState.Finished;
-            winner = gameWinner;
             emit GlobalWinner(gameWinner);
         }
 

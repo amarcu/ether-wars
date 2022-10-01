@@ -1,0 +1,131 @@
+import subprocess
+import sys
+from matplotlib.pyplot import cla
+import requests
+import json
+
+# api-endpoint
+#URL = "https://webserver.amarcu.dev:3000"
+URL = "http://127.0.0.1:3000"
+UNRATED_API_ENDPOINT = URL+"/player/unrated"
+FIND_API_ENDPOINT = URL+"/player/findGame"
+SAVEGAME_API_ENDPOINT = URL+"/player/saveGame"
+MARK_PLAYER_API_ENDPOINT = URL+"/player/markRated"
+
+GAME_COUNT = 3
+challengeId = 1
+
+def main():
+    
+    (playerId,byteCode) = findUnrankedPlayer(challengeId)
+
+    data = {
+        'playerId': playerId,
+        'challengeId':challengeId
+    }
+
+    for count in range(GAME_COUNT):
+        playGame(data,playerId,byteCode)
+
+    markPlayer(challengeId,playerId)
+
+
+def markPlayer(challengeId, playerId):
+    data = {
+        'playerId': playerId,
+        'challengeId':challengeId
+    }
+
+    # sending post request and saving response as response object
+    r = requests.post(url = MARK_PLAYER_API_ENDPOINT, data = data,verify=False)
+    if r.status_code != 200:
+        print("Error marking player as rated "+ r.status_code)
+        return
+
+
+def findUnrankedPlayer(challengeId):
+    data = {
+        'challengeId':challengeId
+    }
+
+    # sending post request and saving response as response object
+    r = requests.get(url = UNRATED_API_ENDPOINT, data = data,verify=False)
+    if r.status_code != 200:
+        print("Error retrieving unraked player "+ r.status_code)
+        sys.exit()
+
+
+    if r.text == "NO_PLAYER":
+        print("No unraked player found ")
+        sys.exit()
+
+    json_data = r.json()
+    playerId = json_data["playerId"]
+    byteCode = json_data["byteCode"]
+
+    return (playerId,byteCode)
+
+def playGame(findData, playerId, byteCode):
+    r = requests.get(url = FIND_API_ENDPOINT, data = findData,verify=False)
+    if r.status_code != 200:
+        print("Error retrieving opponent "+ r.status_code)
+        sys.exit()
+
+    opponent_json_data = r.json()
+    opponent_playerId = opponent_json_data["playerId"]
+    opponent_byteCode = opponent_json_data["byteCode"]
+
+    print ("Playing game between playerId="+playerId+" and playerId="+opponent_playerId)
+
+    result = {
+        "a":playerId,
+        "b":byteCode,
+        "c":opponent_playerId,
+        "d":opponent_byteCode,
+    }
+
+
+    #print (str(result))
+    f = open("../logs/game_params.txt", "w")
+    f.write(json.dumps(result))
+    f.close()
+
+    run_command = "forge script ./TicTacToe.s.sol"
+
+    p = subprocess.Popen(run_command, stdout=subprocess.PIPE, shell=True)
+
+    (output, err) = p.communicate()  
+
+    # wait for end of game 
+    p_status = p.wait()
+
+    #print("Command output: " + str(output))
+
+    f = open("../logs/game.txt", "r")
+    gameLogRaw = repr(f.read())
+    f.close()
+
+    f = open("../logs/winner.txt", "r")
+    winner = int(f.read())
+    f.close()
+
+    print("winner: " + str(winner))
+
+    gameOutputData = {
+        'player1Id':playerId,
+        'player2Id':opponent_playerId,
+        'challengeId':challengeId,
+        'log':gameLogRaw,
+        'winner':winner
+    }
+
+    r = requests.post(url = SAVEGAME_API_ENDPOINT, data = gameOutputData,verify=False)
+    if r.status_code != 200:
+        print("Error updating game"+ r.status_code)
+        sys.exit()
+
+    print("Game succesfully played")
+
+if __name__=="__main__":
+   main()
+

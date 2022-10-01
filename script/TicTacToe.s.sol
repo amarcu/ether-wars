@@ -12,10 +12,19 @@ import {TicTacToeSimplePlayer} from "../src/TicTacToe/TicTacToeSimplePlayer.sol"
 import {TicTacToeLocalHeuristics} from "../src/TicTacToe/TicTacToeLocalHeuristics.sol";
 
 
+struct GameParams{
+    string p1;
+    bytes b1;
+    string p2;
+    bytes b2;
+}
+
 contract TicTacToeScript is Script {
 
     event log_uint(uint256 len);
     event log_bytes(bytes);
+    event log_string(string);
+    event log_gameParams(string p1 ,bytes b1,string p2,bytes b2);
     Vm public cheatCodes = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
     
     struct MoveData{
@@ -24,18 +33,23 @@ contract TicTacToeScript is Script {
     }
 
     TicTacToeGame public game;
-    TicTacToeSimplePlayer public player1;
-    TicTacToeLocalHeuristics public player2;
     MoveData[] public turnMoves;
 
     function run() public {
-        
-        player1 = new TicTacToeSimplePlayer();
-        player2 = new TicTacToeLocalHeuristics();
-        
+
+        GameParams memory params;
+        try vm.readFile("logs/game_params.txt") returns (string memory paramsJson){
+            bytes memory jsonBytes = vm.parseJson(paramsJson);
+            params = abi.decode(jsonBytes,(GameParams));
+            //emit log_gameParams(params.p1, params.b1, params.p2, params.b2);
+        } catch {
+            // no game params, do something here
+            return;
+        }
+
         address[] memory players = new address[](2);
-        players[0] = address(player1);
-        players[1] = address(player2);
+        players[0] = _deployBytecode(params.b1);
+        players[1] = _deployBytecode(params.b2);
 
         try vm.removeFile("logs/game.txt") {} catch{}
 
@@ -65,6 +79,23 @@ contract TicTacToeScript is Script {
                 lineLog = string.concat(lineLog,Strings.toString(coords.y));
                 vm.writeLine("logs/game.txt",lineLog);
             }
+        }
+
+        try vm.removeFile("logs/winner.txt") {} catch{}
+        string memory lineWinner = Strings.toString(game.gameWinner());
+        vm.writeLine("logs/winner.txt",lineWinner);
+    }
+
+        
+    /// @notice Deploys the `bytecode`
+    /// @param bytecode The byte code that will be deployed
+    /// @return deployedAddress The address of the newly deployed contract
+    function _deployBytecode(bytes memory bytecode)
+        internal
+        returns (address deployedAddress)
+    {
+        assembly {
+            deployedAddress := create(0, add(bytecode, 0x20), mload(bytecode))
         }
     }
 }
