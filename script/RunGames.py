@@ -3,7 +3,10 @@ import sys
 import requests
 import json
 import time
+import urllib3
 
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # api-endpoint
 #URL = "https://webserver.amarcu.dev:3000"
 URL = "https://127.0.0.1:3000"
@@ -44,6 +47,7 @@ def markPlayer(challengeId, playerId):
     if r.status_code != 200:
         print("Error marking player as rated "+ r.status_code)
         return
+    
 
 
 def findUnrankedPlayer(challengeId):
