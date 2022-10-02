@@ -40,7 +40,7 @@ def markPlayer(challengeId, playerId):
     }
 
     # sending post request and saving response as response object
-    r = requests.post(url = MARK_PLAYER_API_ENDPOINT, data = data,verify=False)
+    r = requests.post(url = MARK_PLAYER_API_ENDPOINT, data = data)
     if r.status_code != 200:
         print("Error marking player as rated "+ r.status_code)
         return
@@ -52,7 +52,7 @@ def findUnrankedPlayer(challengeId):
     }
 
     # sending post request and saving response as response object
-    r = requests.get(url = UNRATED_API_ENDPOINT, data = data,verify=False)
+    r = requests.get(url = UNRATED_API_ENDPOINT, data = data)
     if r.status_code != 200:
         print("Error retrieving unraked player "+ r.status_code)
         sys.exit()
@@ -69,7 +69,7 @@ def findUnrankedPlayer(challengeId):
     return (playerId,byteCode)
 
 def playGame(findData, playerId, byteCode):
-    r = requests.get(url = FIND_API_ENDPOINT, data = findData,verify=False)
+    r = requests.get(url = FIND_API_ENDPOINT, data = findData)
     if r.status_code != 200:
         print("Error retrieving opponent "+ r.status_code)
         sys.exit()
@@ -122,7 +122,7 @@ def playGame(findData, playerId, byteCode):
         'winner':winner
     }
 
-    r = requests.post(url = SAVEGAME_API_ENDPOINT, data = gameOutputData,verify=False)
+    r = requests.post(url = SAVEGAME_API_ENDPOINT, data = gameOutputData)
     if r.status_code != 200:
         print("Error updating game"+ r.status_code)
         sys.exit()
