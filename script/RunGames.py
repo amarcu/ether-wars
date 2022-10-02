@@ -1,8 +1,8 @@
 import subprocess
 import sys
-from matplotlib.pyplot import cla
 import requests
 import json
+import time
 
 # api-endpoint
 #URL = "https://webserver.amarcu.dev:3000"
@@ -12,22 +12,25 @@ FIND_API_ENDPOINT = URL+"/player/findGame"
 SAVEGAME_API_ENDPOINT = URL+"/player/saveGame"
 MARK_PLAYER_API_ENDPOINT = URL+"/player/markRated"
 
-GAME_COUNT = 3
+GAME_COUNT = 10
 challengeId = 1
 
 def main():
     
-    (playerId,byteCode) = findUnrankedPlayer(challengeId)
+    while(True):
+        (playerId,byteCode) = findUnrankedPlayer(challengeId)
 
-    data = {
-        'playerId': playerId,
-        'challengeId':challengeId
-    }
+        data = {
+            'playerId': playerId,
+            'challengeId':challengeId
+        }
 
-    for count in range(GAME_COUNT):
-        playGame(data,playerId,byteCode)
+        for count in range(GAME_COUNT):
+            playGame(data,playerId,byteCode)
 
-    markPlayer(challengeId,playerId)
+        markPlayer(challengeId,playerId)
+
+        time.sleep(1)
 
 
 def markPlayer(challengeId, playerId):
