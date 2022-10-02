@@ -43,6 +43,7 @@ def markPlayer(challengeId, playerId):
         'challengeId':challengeId
     }
 
+    print ("Mark Player " + playerId + " as ranked")
     # sending post request and saving response as response object
     r = requests.post(url = MARK_PLAYER_API_ENDPOINT, data = data,verify=False)
     if r.status_code != 200:
