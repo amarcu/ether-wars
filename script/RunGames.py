@@ -23,7 +23,7 @@ def main():
     while(True):
         (playerId,byteCode) = findUnrankedPlayer(challengeId)
 
-        if(playerId >= 0):
+        if playerId != "":
             data = {
                 'playerId': playerId,
                 'challengeId':challengeId
@@ -60,12 +60,12 @@ def findUnrankedPlayer(challengeId):
     r = requests.get(url = UNRATED_API_ENDPOINT, data = data,verify=False)
     if r.status_code != 200:
         print("Error retrieving unraked player "+ r.status_code)
-        return (-1,-1)
+        return ("","")
 
 
     if r.text == "NO_PLAYER":
         print("No unraked player found ")
-        return (-1,-1)
+        return ("","")
 
     json_data = r.json()
     playerId = json_data["playerId"]
