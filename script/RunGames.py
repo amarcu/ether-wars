@@ -23,15 +23,16 @@ def main():
     while(True):
         (playerId,byteCode) = findUnrankedPlayer(challengeId)
 
-        data = {
-            'playerId': playerId,
-            'challengeId':challengeId
-        }
+        if(playerId >= 0):
+            data = {
+                'playerId': playerId,
+                'challengeId':challengeId
+            }
 
-        for count in range(GAME_COUNT):
-            playGame(data,playerId,byteCode)
+            for count in range(GAME_COUNT):
+                playGame(data,playerId,byteCode)
 
-        markPlayer(challengeId,playerId)
+            markPlayer(challengeId,playerId)
 
         time.sleep(1)
 
@@ -59,12 +60,12 @@ def findUnrankedPlayer(challengeId):
     r = requests.get(url = UNRATED_API_ENDPOINT, data = data,verify=False)
     if r.status_code != 200:
         print("Error retrieving unraked player "+ r.status_code)
-        sys.exit()
+        return (-1,-1)
 
 
     if r.text == "NO_PLAYER":
         print("No unraked player found ")
-        sys.exit()
+        return (-1,-1)
 
     json_data = r.json()
     playerId = json_data["playerId"]
@@ -76,7 +77,7 @@ def playGame(findData, playerId, byteCode):
     r = requests.get(url = FIND_API_ENDPOINT, data = findData,verify=False)
     if r.status_code != 200:
         print("Error retrieving opponent "+ r.status_code)
-        sys.exit()
+        return False
 
     opponent_json_data = r.json()
     opponent_playerId = opponent_json_data["playerId"]
@@ -129,9 +130,10 @@ def playGame(findData, playerId, byteCode):
     r = requests.post(url = SAVEGAME_API_ENDPOINT, data = gameOutputData,verify=False)
     if r.status_code != 200:
         print("Error updating game"+ r.status_code)
-        sys.exit()
+        return False
 
     print("Game succesfully played")
+    return True
 
 if __name__=="__main__":
    main()
