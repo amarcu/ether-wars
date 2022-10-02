@@ -6,7 +6,7 @@ import json
 
 # api-endpoint
 #URL = "https://webserver.amarcu.dev:3000"
-URL = "http://127.0.0.1:3000"
+URL = "https://127.0.0.1:3000"
 UNRATED_API_ENDPOINT = URL+"/player/unrated"
 FIND_API_ENDPOINT = URL+"/player/findGame"
 SAVEGAME_API_ENDPOINT = URL+"/player/saveGame"
