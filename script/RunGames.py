@@ -15,7 +15,7 @@ FIND_API_ENDPOINT = URL+"/player/findGame"
 SAVEGAME_API_ENDPOINT = URL+"/player/saveGame"
 MARK_PLAYER_API_ENDPOINT = URL+"/player/markRated"
 
-GAME_COUNT = 10
+GAME_COUNT = 5
 challengeId = 1
 
 def main():
