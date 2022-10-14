@@ -95,7 +95,7 @@ def playGame(findData, playerId, byteCode):
 
 
     #print (str(result))
-    f = open("../logs/game_params.txt", "w")
+    f = open("../logs/game_params.txt", "w+")
     f.write(json.dumps(result))
     f.close()
 
