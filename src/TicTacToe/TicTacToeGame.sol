@@ -2,20 +2,10 @@
 pragma solidity 0.8.13;
 import "forge-std/console.sol";
 import "../Core/AbstractGame.sol";
+import "../Interfaces/ITicTacToeGame.sol";
 import "@openzeppelin/utils/math/SafeMath.sol";
 
-struct Grid {
-    uint8 winner;
-    uint64 moves;
-    uint8[3][3] cells;
-}
-
-struct Coords {
-    uint128 x;
-    uint128 y;
-}
-
-contract TicTacToeGame is AbstractGame {
+contract TicTacToeGame is AbstractGame, ITicTacToeGame {
     using SafeMath for uint128;
     using SafeMath for uint256;
 
@@ -47,20 +37,36 @@ contract TicTacToeGame is AbstractGame {
     function getLocalGrid(uint256 x, uint256 y)
         public
         view
+        override(ITicTacToeGame)
         returns (Grid memory)
     {
         return grids[x][y];
     }
 
-    function getGlobalGrid() public view returns (Grid memory) {
+    function getGlobalGrid()
+        public
+        view
+        override(ITicTacToeGame)
+        returns (Grid memory)
+    {
         return masterGrid;
     }
 
-    function getCurrentGrid() public view returns (Grid memory) {
+    function getCurrentGrid()
+        public
+        view
+        override(ITicTacToeGame)
+        returns (Grid memory)
+    {
         return grids[currentGridCoords.x][currentGridCoords.y];
     }
 
-    function getCurrentGridCoords() public view returns (Coords memory) {
+    function getCurrentGridCoords()
+        public
+        view
+        override(ITicTacToeGame)
+        returns (Coords memory)
+    {
         return currentGridCoords;
     }
 
@@ -152,6 +158,7 @@ contract TicTacToeGame is AbstractGame {
     function toLocalCoords(Coords memory global)
         public
         pure
+        override(ITicTacToeGame)
         returns (Coords memory gridCoords, Coords memory localCoords)
     {
         gridCoords.x = global.x / 3;
@@ -163,19 +170,19 @@ contract TicTacToeGame is AbstractGame {
     function toGlobalCoords(Coords memory gridCoords, Coords memory localCoords)
         public
         pure
+        override(ITicTacToeGame)
         returns (Coords memory globalCoords)
     {
         globalCoords.x = gridCoords.x * 3 + localCoords.x;
         globalCoords.y = gridCoords.y * 3 + localCoords.y;
     }
 
-    function getValidMoves(uint256 playerIndex)
+    function checkWinner(Grid memory grid)
         public
-        view
-        returns (uint128[] memory x, uint128[] memory y)
-    {}
-
-    function checkWinner(Grid memory grid) public pure returns (uint8 winner) {
+        pure
+        override(ITicTacToeGame)
+        returns (uint8 winner)
+    {
         // Stupid check, probably should go with O(1) -> update rows ,cols diag sums on move.
         for (uint256 x = 0; x < 3; ++x) {
             if (

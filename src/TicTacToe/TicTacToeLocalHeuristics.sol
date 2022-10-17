@@ -34,9 +34,9 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
         game = TicTacToeGame(gameAddress);
     }
 
-    function move() external override(IPlayer) returns (bytes memory output) {
+    function move() external override(IPlayer) view returns (bytes memory output) {
         if (game.useCurrentGrid()) {
-            (Coords memory localCoords, uint256 score_) = _findBestMove(
+            (Coords memory localCoords, ) = _findBestMove(
                 game.getCurrentGrid()
             );
             Coords memory globalCoords = game.toGlobalCoords(
@@ -76,7 +76,8 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
 
     function _findBestMove(Grid memory grid)
         internal
-        returns (Coords memory move, uint256 score)
+        view
+        returns (Coords memory move_, uint256 score)
     {
         uint256 otherPlayer = (index + 1) % 2;
         uint256 bestScore = 0;
@@ -112,27 +113,27 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
                 }
 
                 if (enemyCount == 2 && emptyCount == 1) {
-                    move.x = emptyX;
-                    move.y = emptyY;
+                    move_.x = emptyX;
+                    move_.y = emptyY;
                     bestScore = 500;
                 }
 
                 if (meCount == 1 && emptyCount > 0) {
                     if (bestScore < 500) {
-                        move.x = emptyX;
-                        move.y = emptyY;
+                        move_.x = emptyX;
+                        move_.y = emptyY;
                         bestScore = 100;
                     }
                 }
 
                 if (bestScore < 10 && emptyCount > 0) {
-                    move.x = emptyX;
-                    move.y = emptyY;
+                    move_.x = emptyX;
+                    move_.y = emptyY;
                     bestScore = 10;
                 }
             }
         }
 
-        return (move, bestScore);
+        return (move_, bestScore);
     }
 }

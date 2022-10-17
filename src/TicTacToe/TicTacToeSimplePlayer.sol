@@ -23,7 +23,6 @@ contract TicTacToeSimplePlayer is AbstractPlayer {
         override(IPlayer)
         returns (bytes memory output)
     {
-        uint256 currentPlayer = game.currentPlayer();
         if (game.useCurrentGrid()) {
             Coords memory coords = game.getCurrentGridCoords();
             Grid memory grid = game.getCurrentGrid();
