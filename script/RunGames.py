@@ -29,10 +29,14 @@ def main():
                 'challengeId':challengeId
             }
 
+            skipMark = False
             for count in range(GAME_COUNT):
-                playGame(data,playerId,byteCode)
+                if playGame(data,playerId,byteCode) == False:
+                    skipMark = True
 
-            markPlayer(challengeId,playerId)
+
+            if skipMark == False:
+                markPlayer(challengeId,playerId)
 
         time.sleep(10)
 
@@ -83,6 +87,9 @@ def playGame(findData, playerId, byteCode):
     opponent_json_data = r.json()
     opponent_playerId = opponent_json_data["playerId"]
     opponent_byteCode = opponent_json_data["byteCode"]
+
+    if opponent_playerId == 0 or opponent_byteCode == "":
+        return False
 
     print ("Playing game between playerId="+playerId+" and playerId="+opponent_playerId)
 
