@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 struct Grid {
     // 0-> no winner yet, `1` for Player 1, `2` for Player 2 and `3` for a draw
     uint8 winner;
-    // # of moves played in the grid;
+    // # of moves played in the grid
     uint64 moves;
     // Cells containing each move. `0` -> Empty, `1` -> Player 1, `2` -> Player 2
     uint8[3][3] cells;

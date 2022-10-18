@@ -34,7 +34,7 @@ def main():
 
             markPlayer(challengeId,playerId)
 
-        time.sleep(1)
+        time.sleep(10)
 
 
 def markPlayer(challengeId, playerId):
