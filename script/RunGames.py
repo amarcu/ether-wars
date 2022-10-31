@@ -91,7 +91,7 @@ def playGame(findData, playerId, byteCode):
     if opponent_playerId == 0 or opponent_byteCode == "":
         return False
 
-    print ("Playing game between playerId="+playerId+" and playerId="+opponent_playerId)
+    print ("Playing game between playerId="+str(playerId)+" and playerId="+str(opponent_playerId))
 
     result = {
         "a":playerId,
