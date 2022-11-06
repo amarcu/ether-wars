@@ -24,6 +24,7 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
             2,0,1,1,0,2
         ];
     }
+
     /* solhint-enable */
 
     function init(address gameAddress, uint256 index_)
@@ -34,7 +35,9 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
         game = TicTacToeGame(gameAddress);
     }
 
-    function move(bytes calldata /*input*/) external override(IPlayer) view returns (bytes memory output) {
+    function move(
+        bytes calldata /*input*/
+    ) external view override(IPlayer) returns (bytes memory output) {
         if (game.useCurrentGrid()) {
             (Coords memory localCoords, ) = _findBestMove(
                 game.getCurrentGrid()
@@ -102,7 +105,7 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
                     meCount++;
                 } else if (grid.cells[x][y] == otherPlayer + 1) {
                     enemyCount++;
-                } else if (grid.cells[x][y] == 0){
+                } else if (grid.cells[x][y] == 0) {
                     emptyCount++;
                     emptyX = uint128(x);
                     emptyY = uint128(y);

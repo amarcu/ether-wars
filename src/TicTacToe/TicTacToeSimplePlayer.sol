@@ -17,12 +17,9 @@ contract TicTacToeSimplePlayer is AbstractPlayer {
         game = TicTacToeGame(gameAddress);
     }
 
-    function move(bytes calldata /*input*/)
-        external
-        view
-        override(IPlayer)
-        returns (bytes memory output)
-    {
+    function move(
+        bytes calldata /*input*/
+    ) external view override(IPlayer) returns (bytes memory output) {
         if (game.useCurrentGrid()) {
             Coords memory coords = game.getCurrentGridCoords();
             Grid memory grid = game.getCurrentGrid();

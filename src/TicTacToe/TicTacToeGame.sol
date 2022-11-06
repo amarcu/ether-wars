@@ -81,8 +81,13 @@ contract TicTacToeGame is AbstractGame, ITicTacToeGame {
         emit PlayerEliminated(playerIndex);
     }
 
-    function onPreTurn(uint256 playerIndex) internal override(AbstractGame) view returns (bytes memory output){
-        return lastMove[(playerIndex+1)%2];
+    function onPreTurn(uint256 playerIndex)
+        internal
+        view
+        override(AbstractGame)
+        returns (bytes memory output)
+    {
+        return lastMove[(playerIndex + 1) % 2];
     }
 
     function applyMove(bytes calldata input) public override(IGame) {
