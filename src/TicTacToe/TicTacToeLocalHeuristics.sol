@@ -7,12 +7,12 @@ import {TicTacToeGame, Grid, Coords} from "./TicTacToeGame.sol";
 contract TicTacToeLocalHeuristics is AbstractPlayer {
     TicTacToeGame public game;
 
-    uint256 constant WIN_LINE_COUNT = 8;
+    uint256 public constant WIN_LINE_COUNT = 8;
     //8 lines we need to check, each with 3 points, each point with 2 coordinates
     uint8[WIN_LINE_COUNT * 3 * 2] internal winLines;
 
-    /* solhint-disable */
     constructor() AbstractPlayer() {
+        // prettier-ignore
         winLines = [
             0,0,0,1,0,2,
             1,0,1,1,1,2,
@@ -24,8 +24,6 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
             2,0,1,1,0,2
         ];
     }
-
-    /* solhint-enable */
 
     function init(address gameAddress, uint256 index_)
         public

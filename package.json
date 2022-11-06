@@ -1,9 +1,9 @@
 {
-  "name": "magnus",
-  "author": "Daniel Luca (@CleanUnicorn)",
+  "name": "ether-wars",
+  "author": "Alexandru Marcu (@alexmarcudev)",
   "license": "Apache-2.0",
   "version": "1.0.0",
-  "description": "Smart Contract starting template",
+  "description": "Smart Contract Battle Arena",
   "files": [
     "*.sol"
   ],
