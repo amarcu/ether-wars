@@ -34,7 +34,7 @@ contract TicTacToeLocalHeuristics is AbstractPlayer {
         game = TicTacToeGame(gameAddress);
     }
 
-    function move() external override(IPlayer) view returns (bytes memory output) {
+    function move(bytes calldata /*input*/) external override(IPlayer) view returns (bytes memory output) {
         if (game.useCurrentGrid()) {
             (Coords memory localCoords, ) = _findBestMove(
                 game.getCurrentGrid()

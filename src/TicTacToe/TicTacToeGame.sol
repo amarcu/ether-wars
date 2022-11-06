@@ -32,6 +32,8 @@ contract TicTacToeGame is AbstractGame, ITicTacToeGame {
     bool public useCurrentGrid;
     uint256 public gameWinner;
 
+    bytes[2] public lastMove;
+
     Coords internal currentGridCoords;
 
     function getLocalGrid(uint256 x, uint256 y)
@@ -77,6 +79,10 @@ contract TicTacToeGame is AbstractGame, ITicTacToeGame {
         winner = (playerIndex + 1) % 2;
         state = GameState.Finished;
         emit PlayerEliminated(playerIndex);
+    }
+
+    function onPreTurn(uint256 playerIndex) internal override(AbstractGame) view returns (bytes memory output){
+        return lastMove[(playerIndex+1)%2];
     }
 
     function applyMove(bytes calldata input) public override(IGame) {
@@ -152,6 +158,8 @@ contract TicTacToeGame is AbstractGame, ITicTacToeGame {
         currentGridCoords = localCoords;
         useCurrentGrid =
             masterGrid.cells[currentGridCoords.x][currentGridCoords.y] == 0;
+
+        lastMove[currentPlayer] = input;
         currentPlayer = (currentPlayer + 1) % 2;
     }
 

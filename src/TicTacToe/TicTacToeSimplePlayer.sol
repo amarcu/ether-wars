@@ -17,7 +17,7 @@ contract TicTacToeSimplePlayer is AbstractPlayer {
         game = TicTacToeGame(gameAddress);
     }
 
-    function move()
+    function move(bytes calldata /*input*/)
         external
         view
         override(IPlayer)

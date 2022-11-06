@@ -56,19 +56,24 @@ abstract contract AbstractGame is IGame {
 
     function onInvalidMove(uint256 playerIndex) internal virtual;
 
-    function onPreTurn(uint256 playerIndex) internal virtual {}
+    function onPreTurn(uint256 /*playerIndex*/) internal virtual returns (bytes memory output){
+        output = "";
+    }
 
-    function onPostTurn(uint256 playerIndex) internal virtual {}
+    function onPostTurn(uint256 /*playerIndex*/) internal virtual returns (bytes memory output){
+        output = "";
+    }
 
     function execute() external override(IGame) {
         uint256 len = players.length;
+        
         for (uint256 idx = 0; idx < len; ++idx) {
             if (state != GameState.Active) break;
 
             if (!activePlayers[idx]) continue;
 
-            onPreTurn(idx);
-            try players[idx].move{gas: playerGasLimit}() returns (
+            bytes memory input = onPreTurn(idx);
+            try players[idx].move{gas: playerGasLimit}(input) returns (
                 bytes memory playerMove
             ) {
                 try this.applyMove(playerMove) {

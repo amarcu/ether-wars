@@ -17,7 +17,7 @@ contract WrongTicTacToePlayer is AbstractPlayer {
         game = TicTacToeGame(gameAddress);
     }
 
-    function move()
+    function move(bytes calldata /*input*/)
         external
         pure
         override(IPlayer)
