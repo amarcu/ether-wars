@@ -115,7 +115,7 @@ def playGame(findData, playerId, byteCode):
     # wait for end of game 
     p_status = p.wait()
 
-    #print("Command output: " + str(output))
+    print("Command output: " + str(output))
 
     f = open("../logs/game.txt", "r+")
     gameLogRaw = f.read()
