@@ -117,7 +117,7 @@ def playGame(findData, playerId, byteCode):
 
     #print("Command output: " + str(output))
 
-    f = open("../logs/game.txt", "r")
+    f = open("../logs/game.txt", "r+")
     gameLogRaw = f.read()
     f.close()
 
