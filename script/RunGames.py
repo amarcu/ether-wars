@@ -4,6 +4,7 @@ import requests
 import json
 import time
 import urllib3
+import os
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -29,11 +30,10 @@ def main():
                 'challengeId':challengeId
             }
 
-            skipMark = False
+            skipMark = True
             for count in range(GAME_COUNT):
-                if playGame(data,playerId,byteCode) == False:
-                    skipMark = True
-
+                if playGame(data,playerId,byteCode) == True:
+                    skipMark = False
 
             if skipMark == False:
                 markPlayer(challengeId,playerId)
@@ -116,6 +116,9 @@ def playGame(findData, playerId, byteCode):
     p_status = p.wait()
 
     print("Command output: " + str(output))
+
+    if os.path.isfile("../logs/game.txt") == False:
+        return False
 
     f = open("../logs/game.txt", "r+")
     gameLogRaw = f.read()
