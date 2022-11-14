@@ -45,8 +45,17 @@ abstract contract AbstractGame is IGame {
 
         for (uint256 idx = 0; idx < len; ++idx) {
             players[idx] = AbstractPlayer(players_[idx]);
-            players[idx].init(address(this), idx);
-            activePlayers[idx] = true;
+            if(address(players[idx]) == address(0)){
+                activePlayers[idx] = false;
+                onInvalidMove(idx);
+            } else {
+                try players[idx].init(address(this), idx){
+                    activePlayers[idx] = true;
+                } catch {
+                    activePlayers[idx] = false;
+                    onInvalidMove(idx);
+                }
+            }
         }
     }
 
