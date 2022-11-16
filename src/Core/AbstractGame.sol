@@ -6,6 +6,7 @@ import "../Interfaces/IGame.sol";
 
 abstract contract AbstractGame is IGame {
     error AbstractGame__execute_gameNotActive();
+    error AbstractGame__init_invalidState();
 
     enum GameState {
         Invalid,
@@ -60,6 +61,10 @@ abstract contract AbstractGame is IGame {
     }
 
     function start() external override(IGame) {
+        if(state != GameState.Initialized){
+            revert AbstractGame__init_invalidState();
+        }
+
         state = GameState.Active;
     }
 

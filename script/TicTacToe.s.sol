@@ -25,6 +25,7 @@ contract TicTacToeScript is Script {
     event log_bytes(bytes);
     event log_string(string);
     event log_gameParams(string p1 ,bytes b1,string p2,bytes b2);
+    event log_error(uint);
     Vm public cheatCodes = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
     
     struct MoveData{
@@ -55,31 +56,35 @@ contract TicTacToeScript is Script {
 
         game = new TicTacToeGame();
         game.init(players, 2000000);
-        game.start();
+        try game.start() {
+            while (game.state() == AbstractGame.GameState.Active){
+                game.execute();
 
-        while (game.state() == AbstractGame.GameState.Active){
-            game.execute();
+                bytes memory move1 =  game.moves(0);
+                bytes memory move2 = game.moves(1);
 
-            bytes memory move1 =  game.moves(0);
-            bytes memory move2 = game.moves(1);
+                string memory lineLog = "";
+                if (move1.length != 0){
+                    Coords memory coords = abi.decode(move1,(Coords));
+                    lineLog = string.concat("0 ",Strings.toString(coords.x));
+                    lineLog = string.concat(lineLog," ");
+                    lineLog = string.concat(lineLog,Strings.toString(coords.y));
+                    vm.writeLine("logs/game.txt",lineLog);
+                } else {
+                    emit log_error(0);
+                }
 
-            string memory lineLog = "";
-            if (move1.length != 0){
-                Coords memory coords = abi.decode(move1,(Coords));
-                lineLog = string.concat("0 ",Strings.toString(coords.x));
-                lineLog = string.concat(lineLog," ");
-                lineLog = string.concat(lineLog,Strings.toString(coords.y));
-                vm.writeLine("logs/game.txt",lineLog);
+                if (move2.length != 0){
+                    Coords memory coords = abi.decode(move2,(Coords));
+                    lineLog = string.concat("1 ",Strings.toString(coords.x));
+                    lineLog = string.concat(lineLog," ");
+                    lineLog = string.concat(lineLog,Strings.toString(coords.y));
+                    vm.writeLine("logs/game.txt",lineLog);
+                } else {
+                    emit log_error(1);
+                }
             }
-
-            if (move2.length != 0){
-                Coords memory coords = abi.decode(move2,(Coords));
-                lineLog = string.concat("1 ",Strings.toString(coords.x));
-                lineLog = string.concat(lineLog," ");
-                lineLog = string.concat(lineLog,Strings.toString(coords.y));
-                vm.writeLine("logs/game.txt",lineLog);
-            }
-        }
+        }catch{}
 
         try vm.removeFile("logs/winner.txt") {} catch{}
         string memory lineWinner = Strings.toString(game.gameWinner());
