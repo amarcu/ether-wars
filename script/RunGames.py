@@ -17,6 +17,7 @@ SAVEGAME_API_ENDPOINT = URL+"/player/saveGame"
 MARK_PLAYER_API_ENDPOINT = URL+"/player/markRated"
 
 GAME_COUNT = 5
+FAIL_ABORT_COUNT = 5
 challengeId = 1
 
 def main():
@@ -30,15 +31,11 @@ def main():
                 'challengeId':challengeId
             }
 
-            skipMark = True
+            #skipMark = True
             for count in range(GAME_COUNT):
-                if playGame(data,playerId,byteCode) == True:
-                    skipMark = False
-                else:
-                    print("Game failed")
+                playGame(data,playerId,byteCode)
 
-            if skipMark == False:
-                markPlayer(challengeId,playerId)
+            markPlayer(challengeId,playerId)
 
         time.sleep(10)
 
