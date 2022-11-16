@@ -34,6 +34,8 @@ def main():
             for count in range(GAME_COUNT):
                 if playGame(data,playerId,byteCode) == True:
                     skipMark = False
+                else:
+                    print("Game failed")
 
             if skipMark == False:
                 markPlayer(challengeId,playerId)
